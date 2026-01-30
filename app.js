@@ -379,16 +379,16 @@ class EcoLogroApp {
         const lower = parseInt(this.elements.lowerThreshold.value) || 25;
         const upper = parseInt(this.elements.upperThreshold.value) || 75;
 
-        // Mapeo no lineal para expandir la zona verde visualmente
+        // Mapeo no lineal para diseño de 3 Tercios (Rojo, Verde, Negro)
         if (this.displayedVolume <= lower) {
-            // Zona Roja/Baja: Mapear 0..lower a 0%..30% de altura
-            // Si lower es muy bajo (ej. 10), esto hace que subir a 10 ya llene el 30% de la barra
-            visualHeight = (this.displayedVolume / Math.max(1, lower)) * 30;
+            // Zona Roja/Baja: Mapear 0..lower a 0%..33.3% de altura
+            visualHeight = (this.displayedVolume / Math.max(1, lower)) * 33.3;
         } else if (this.displayedVolume <= upper) {
-            // Zona Verde/Óptima: Mapear lower..upper a 30%..85% de altura (¡El área grande!)
+            // Zona Verde/Óptima: Mapear lower..upper a 33.3%..85% de altura
+            // Esto asegura que al entrar en verde, ya ocupamos más de 1/3 de la barra
             const range = Math.max(1, upper - lower);
             const progress = (this.displayedVolume - lower) / range;
-            visualHeight = 30 + (progress * 55);
+            visualHeight = 33.3 + (progress * 51.7); // 33.3 + 51.7 ≈ 85
         } else {
             // Zona Negra/Alta: Mapear upper..100 a 85%..100%
             const range = Math.max(1, 100 - upper);

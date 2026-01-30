@@ -308,18 +308,30 @@ body.state-danger .background-waves {
     left: 0;
     width: 100%;
     height: 0%;
-    /* Gradiente multicolor: 3 tercios exactos */
-    background: linear-gradient(to top,
-            #EF4444 0%, #EF4444 33.33%,
-            /* Rojo: 1er tercio */
-            #10B981 33.33%, #10B981 66.66%,
-            /* Verde: 2º tercio */
-            #1a1a1a 66.66%, #1a1a1a 100%);
-    /* Negro: 3er tercio */
-    transition: height 100ms cubic-bezier(0.4, 0, 0.2, 1);
-    /* Transición suave pero rápida */
+    /* Color base dinámico (se cambiará vía JS con clases) */
+    background-color: var(--color-danger);
+    transition: height 100ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms ease;
     border-radius: var(--radius-md) var(--radius-md) 0 0;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estados dinámicos de color para la barra */
+.thermometer-fill.fill-low {
+    background-color: #EF4444;
+    /* Rojo */
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.thermometer-fill.fill-optimal {
+    background-color: #10B981;
+    /* Verde */
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.thermometer-fill.fill-high {
+    background-color: #1a1a1a;
+    /* Negro */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
 }
 
 .thermometer-scale {

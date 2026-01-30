@@ -381,16 +381,15 @@ class EcoLogroApp {
 
         // Mapeo no lineal para diseño de 3 Tercios (Rojo, Verde, Negro)
         if (this.displayedVolume <= lower) {
-            // Zona Roja/Baja: Mapear 0..lower a 0%..33.3% de altura
+            // Zona Roja/Baja
             visualHeight = (this.displayedVolume / Math.max(1, lower)) * 33.3;
         } else if (this.displayedVolume <= upper) {
-            // Zona Verde/Óptima: Mapear lower..upper a 33.3%..85% de altura
-            // Esto asegura que al entrar en verde, ya ocupamos más de 1/3 de la barra
+            // Zona Verde/Óptima
             const range = Math.max(1, upper - lower);
             const progress = (this.displayedVolume - lower) / range;
             visualHeight = 33.3 + (progress * 51.7); // 33.3 + 51.7 ≈ 85
         } else {
-            // Zona Negra/Alta: Mapear upper..100 a 85%..100%
+            // Zona Negra/Alta
             const range = Math.max(1, 100 - upper);
             const progress = (this.displayedVolume - upper) / range;
             visualHeight = 85 + (progress * 15);
@@ -399,6 +398,18 @@ class EcoLogroApp {
         // Asegurar límites visuales
         visualHeight = Math.min(100, Math.max(0, visualHeight));
         this.elements.thermometerFill.style.height = `${visualHeight}%`;
+
+        // Aplicar COLOR dinámico según la altura visual
+        // Limpiamos clases y añadimos la correcta
+        this.elements.thermometerFill.classList.remove('fill-low', 'fill-optimal', 'fill-high');
+
+        if (visualHeight <= 33.3) {
+            this.elements.thermometerFill.classList.add('fill-low');
+        } else if (visualHeight <= 85) {
+            this.elements.thermometerFill.classList.add('fill-optimal');
+        } else {
+            this.elements.thermometerFill.classList.add('fill-high');
+        }
     }
 
     /**

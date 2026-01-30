@@ -338,48 +338,67 @@ class EcoLogroApp {
     updateThermometer(volume) {
         const currentTime = Date.now();
 
-        // Peak Hold Logic:
-        // 1. Si el volumen aumenta, actualizamos inmediatamente y reseteamos el timer.
-        // 2. Si el volumen baja, mantenemos el valor anterior (Hold) durante el tiempo configurado.
+        // --- 1. LÓGICA DE PERSISTENCIA (Peak Hold) ---
 
-        // Umbral mínimo de ruido para considerar que "hay sonido" (evitar estática)
-        const noiseFloor = 5;
+        // Umbral mínimo de ruido
+        const noiseFloor = 3;
 
         if (volume > this.lastSignificantVolume) {
-            // El volumen subió: actualizamos instantáneamente
+            // Subida: actualización instantánea
             this.lastSignificantVolume = volume;
             this.lastVolumeTimestamp = currentTime;
             this.displayedVolume = volume;
         } else {
-            // El volumen bajó: entramos en lógica de persistencia
+            // Bajada: aplicar persistencia
             const timeSinceLastPeak = currentTime - this.lastVolumeTimestamp;
 
             if (timeSinceLastPeak < this.volumeHoldDuration) {
-                // Durante el tiempo de espera, mantenemos el pico anterior
+                // Hold
                 this.displayedVolume = this.lastSignificantVolume;
             } else {
-                // Se acabó el tiempo de espera: aplicamos decaimiento suave
-                // Esto hace que la barra baje suavemente en lugar de saltar a 0
-                const decayDuration = 1000; // Tardar 1 segundo en bajar una vez empieza
+                // Decay
+                const decayDuration = 1000;
                 const timeInDecay = timeSinceLastPeak - this.volumeHoldDuration;
-
-                // Calculamos cuánto deberíamos haber bajado linealmente
                 const progress = Math.min(1, timeInDecay / decayDuration);
-
-                // Interpolamos entre el pico y el volumen actual real
                 this.displayedVolume = this.lastSignificantVolume * (1 - progress) + (volume * progress);
 
-                // Si el decaimiento ha terminado, reseteamos el pico al volumen actual
                 if (progress >= 1) {
-                    this.lastSignificantVolume = volume; // El nuevo "pico" es el nivel actual bajo
-                    this.lastVolumeTimestamp = currentTime; // Reseteamos timer para el nuevo nivel
+                    this.lastSignificantVolume = volume;
+                    this.lastVolumeTimestamp = currentTime;
                 }
             }
         }
 
+        // --- 2. ESCALADO VISUAL INTELIGENTE ---
+        // Transformamos el volumen numérico en altura visual basada en las zonas
+
+        let visualHeight = 0;
+
+        // Cargar umbrales actuales (o usar defaults si no están en memoria)
+        // Nota: this.stateManager suele tener la config más fresca
+        const lower = parseInt(this.elements.lowerThreshold.value) || 25;
+        const upper = parseInt(this.elements.upperThreshold.value) || 75;
+
+        // Mapeo no lineal para expandir la zona verde visualmente
+        if (this.displayedVolume <= lower) {
+            // Zona Roja/Baja: Mapear 0..lower a 0%..30% de altura
+            // Si lower es muy bajo (ej. 10), esto hace que subir a 10 ya llene el 30% de la barra
+            visualHeight = (this.displayedVolume / Math.max(1, lower)) * 30;
+        } else if (this.displayedVolume <= upper) {
+            // Zona Verde/Óptima: Mapear lower..upper a 30%..85% de altura (¡El área grande!)
+            const range = Math.max(1, upper - lower);
+            const progress = (this.displayedVolume - lower) / range;
+            visualHeight = 30 + (progress * 55);
+        } else {
+            // Zona Negra/Alta: Mapear upper..100 a 85%..100%
+            const range = Math.max(1, 100 - upper);
+            const progress = (this.displayedVolume - upper) / range;
+            visualHeight = 85 + (progress * 15);
+        }
+
         // Asegurar límites visuales
-        const percentage = Math.min(100, Math.max(0, this.displayedVolume));
-        this.elements.thermometerFill.style.height = `${percentage}%`;
+        visualHeight = Math.min(100, Math.max(0, visualHeight));
+        this.elements.thermometerFill.style.height = `${visualHeight}%`;
     }
 
     /**

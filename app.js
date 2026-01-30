@@ -384,13 +384,19 @@ class EcoLogroApp {
         } else if (this.displayedVolume <= upper) {
             // Zona Verde/Óptima
             const range = Math.max(1, upper - lower);
-            const progress = (this.displayedVolume - lower) / range;
-            visualHeight = 33.3 + (progress * 51.7); // 33.3 + 51.7 ≈ 85
+            let progress = (this.displayedVolume - lower) / range;
+
+            // Aplicar curva para que la barra suba rápido visualmente (sensación de llenado)
+            // Con raíz cuadrada, el 25% de volumen real se ve como 50% visual
+            // Y el 50% real se ve como 70-75% visual.
+            progress = Math.pow(progress, 0.5);
+
+            visualHeight = 33.3 + (progress * 56.7); // Llega hasta el 90% visualmente
         } else {
-            // Zona Negra/Alta
+            // Zona Negra/Alta: Mapear upper..100 a 90%..100%
             const range = Math.max(1, 100 - upper);
             const progress = (this.displayedVolume - upper) / range;
-            visualHeight = 85 + (progress * 15);
+            visualHeight = 90 + (progress * 10);
         }
 
         // Asegurar límites visuales

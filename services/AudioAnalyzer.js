@@ -165,9 +165,9 @@ class AudioAnalyzer {
         }
         const rms = Math.sqrt(sum / this.bufferLength);
 
-        // Convertir a escala 0-100 con boost aumentado agresivamente (x400)
-        // Esto permite que voces normales llenen la barra sin gritar
-        const volume = Math.min(100, rms * 400);
+        // Convertir a escala 0-100 con boost extremo (x600)
+        // Sensibilidad muy alta solicitada por el usuario para llenar la barra fácilmente
+        const volume = Math.min(100, rms * 600);
 
         return volume;
     }

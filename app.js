@@ -337,34 +337,47 @@ class EcoLogroApp {
      */
     updateThermometer(volume) {
         const currentTime = Date.now();
-        const timeSinceLastVolume = currentTime - this.lastVolumeTimestamp;
 
-        // Si el volumen nuevo es significativo (mayor que 3), actualizar inmediatamente
-        if (volume > 3) {
+        // Peak Hold Logic:
+        // 1. Si el volumen aumenta, actualizamos inmediatamente y reseteamos el timer.
+        // 2. Si el volumen baja, mantenemos el valor anterior (Hold) durante el tiempo configurado.
+
+        // Umbral mínimo de ruido para considerar que "hay sonido" (evitar estática)
+        const noiseFloor = 5;
+
+        if (volume > this.lastSignificantVolume) {
+            // El volumen subió: actualizamos instantáneamente
             this.lastSignificantVolume = volume;
             this.lastVolumeTimestamp = currentTime;
             this.displayedVolume = volume;
         } else {
-            // Si el volumen es bajo o silencio, mantener el valor anterior
-            // durante el tiempo de hold (2 segundos)
-            if (timeSinceLastVolume < this.volumeHoldDuration) {
-                // Mantener el volumen alto durante el período de hold
+            // El volumen bajó: entramos en lógica de persistencia
+            const timeSinceLastPeak = currentTime - this.lastVolumeTimestamp;
+
+            if (timeSinceLastPeak < this.volumeHoldDuration) {
+                // Durante el tiempo de espera, mantenemos el pico anterior
                 this.displayedVolume = this.lastSignificantVolume;
             } else {
-                // Después de 2 segundos, permitir decay gradual
-                const decayTime = timeSinceLastVolume - this.volumeHoldDuration;
-                const decayRate = 0.002; // Velocidad de decaimiento (2% por segundo después del hold)
-                const decayFactor = Math.exp(-decayRate * decayTime);
+                // Se acabó el tiempo de espera: aplicamos decaimiento suave
+                // Esto hace que la barra baje suavemente en lugar de saltar a 0
+                const decayDuration = 1000; // Tardar 1 segundo en bajar una vez empieza
+                const timeInDecay = timeSinceLastPeak - this.volumeHoldDuration;
 
-                this.displayedVolume = this.lastSignificantVolume * decayFactor;
+                // Calculamos cuánto deberíamos haber bajado linealmente
+                const progress = Math.min(1, timeInDecay / decayDuration);
 
-                // Si ya bajó mucho, permitir que llegue a 0
-                if (this.displayedVolume < 3) {
-                    this.displayedVolume = volume;
+                // Interpolamos entre el pico y el volumen actual real
+                this.displayedVolume = this.lastSignificantVolume * (1 - progress) + (volume * progress);
+
+                // Si el decaimiento ha terminado, reseteamos el pico al volumen actual
+                if (progress >= 1) {
+                    this.lastSignificantVolume = volume; // El nuevo "pico" es el nivel actual bajo
+                    this.lastVolumeTimestamp = currentTime; // Reseteamos timer para el nuevo nivel
                 }
             }
         }
 
+        // Asegurar límites visuales
         const percentage = Math.min(100, Math.max(0, this.displayedVolume));
         this.elements.thermometerFill.style.height = `${percentage}%`;
     }

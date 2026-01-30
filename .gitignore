@@ -1,0 +1,14 @@
+# System files
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Node/NPM (si usaras modulos en el futuro)
+node_modules/
+npm-debug.log
+
+# Editor directories
+.vscode/
+.idea/

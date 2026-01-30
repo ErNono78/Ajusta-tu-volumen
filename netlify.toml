@@ -1,0 +1,16 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Permisos importantes para el micrófono
+    Permissions-Policy = "microphone=*"
+    
+    # Seguridad básica
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+
+    # Caché para archivos estáticos (imágenes, fuentes)
+    Cache-Control = "public, max-age=0, must-revalidate"

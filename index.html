@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Eco-Logro - Aplicación educativa para monitorear el volumen de voz en tiempo real con feedback visual">
+    <meta name="keywords" content="volumen, voz, educación, monitoreo, feedback">
+    <title>Eco-Logro - Monitor de Volumen de Voz</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Background Waves -->
+        <div class="background-waves" aria-hidden="true"></div>
+
+        <!-- Main Header -->
+        <header class="app-header">
+            <h1 class="app-title">Ajusta tu volumen de voz</h1>
+            <p class="status-message" id="statusMessage">Habla un poco, no te oigo</p>
+        </header>
+
+        <!-- Main Visualizer Area -->
+        <main class="visualizer-container">
+            <!-- Emoji Reaction -->
+            <div class="emoji-reaction" id="emojiReaction" aria-live="polite">
+                <span class="emoji" id="emojiIcon">🤔</span>
+            </div>
+
+            <!-- Thermometer Component -->
+            <div class="thermometer" id="thermometer">
+                <div class="thermometer-bulb">
+                    <div class="thermometer-mercury" id="thermometerMercury"></div>
+                </div>
+                <div class="thermometer-tube">
+                    <div class="thermometer-fill" id="thermometerFill"></div>
+                    <div class="thermometer-scale">
+                        <div class="scale-line" style="bottom: 90%;"></div>
+                        <div class="scale-line" style="bottom: 70%;"></div>
+                        <div class="scale-line" style="bottom: 50%;"></div>
+                        <div class="scale-line" style="bottom: 30%;"></div>
+                        <div class="scale-line" style="bottom: 10%;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Stats Panel -->
+        <aside class="stats-panel" id="statsPanel">
+            <div class="stat-item">
+                <span class="stat-label">TIEMPO TOTAL</span>
+                <span class="stat-value" id="totalTime">00:00</span>
+            </div>
+            <div class="stat-item stat-success">
+                <span class="stat-label">TIEMPO CORRECTO</span>
+                <span class="stat-value" id="greenTime">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">% ÉXITO</span>
+                <span class="stat-value" id="successRate">0%</span>
+            </div>
+        </aside>
+
+        <!-- Control Buttons -->
+        <nav class="control-buttons" role="navigation">
+            <button class="control-btn" id="shareBtn" aria-label="Compartir" title="Compartir">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+            </button>
+
+            <button class="control-btn" id="helpBtn" aria-label="Ayuda" title="Ayuda">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </button>
+
+            <button class="control-btn" id="moreBtn" aria-label="Más opciones" title="Más opciones">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                </svg>
+            </button>
+
+            <button class="control-btn control-btn-primary" id="pauseBtn" aria-label="Pausar" title="Pausar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            </button>
+
+            <button class="control-btn" id="settingsBtn" aria-label="Configuración" title="Configuración">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M12 1v6m0 6v6m5.656-14.656l-4.243 4.243m-2.828 2.828l-4.243 4.243m14.142 0l-4.243-4.243m-2.828-2.828L1.343 5.343">
+                    </path>
+                </svg>
+            </button>
+        </nav>
+
+        <!-- Control Panel (Collapsible) -->
+        <div class="control-panel" id="controlPanel">
+            <div class="control-panel-header">
+                <h2>Configuración</h2>
+                <button class="close-btn" id="closePanel" aria-label="Cerrar panel">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="control-panel-content">
+                <!-- Student Name -->
+                <div class="control-group">
+                    <label for="studentName" class="control-label">
+                        <span>Nombre del Alumno</span>
+                    </label>
+                    <div class="input-container">
+                        <input type="text" id="studentName" class="text-input" placeholder="Escribe tu nombre aquí"
+                            maxlength="30" aria-label="Nombre del alumno">
+                    </div>
+                    <p class="control-description">Tu nombre aparecerá en los mensajes de ánimo</p>
+                </div>
+
+                <!-- Sensitivity Control -->
+                <div class="control-group">
+                    <label for="sensitivitySlider" class="control-label">
+                        <span>Sensibilidad</span>
+                        <span class="control-value" id="sensitivityValue">85%</span>
+                    </label>
+                    <div class="slider-container">
+                        <span class="slider-hint">Menos</span>
+                        <input type="range" id="sensitivitySlider" class="slider slider-sensitivity" min="0" max="100"
+                            value="85" aria-label="Ajustar sensibilidad del micrófono">
+                        <span class="slider-hint">Más</span>
+                    </div>
+                    <p class="control-description">Ajusta la sensibilidad del micrófono según el ruido ambiental</p>
+                </div>
+
+                <!-- Dampening Control -->
+                <div class="control-group">
+                    <label for="dampeningSlider" class="control-label">
+                        <span>Amortiguación</span>
+                        <span class="control-value" id="dampeningValue">20%</span>
+                    </label>
+                    <div class="slider-container">
+                        <span class="slider-hint">Menos</span>
+                        <input type="range" id="dampeningSlider" class="slider slider-dampening" min="0" max="100"
+                            value="20" aria-label="Ajustar amortiguación de cambios">
+                        <span class="slider-hint">Más</span>
+                    </div>
+                    <p class="control-description">Suaviza los cambios bruscos en el volumen detectado</p>
+                </div>
+
+                <!-- Persistence Duration Control -->
+                <div class="control-group">
+                    <label for="persistenceSlider" class="control-label">
+                        <span>Persistencia</span>
+                        <span class="control-value" id="persistenceValue">2.0s</span>
+                    </label>
+                    <div class="slider-container">
+                        <span class="slider-hint">0.5s</span>
+                        <input type="range" id="persistenceSlider" class="slider slider-persistence" min="500"
+                            max="10000" step="500" value="2000" aria-label="Ajustar duración de persistencia">
+                        <span class="slider-hint">10s</span>
+                    </div>
+                    <p class="control-description">Tiempo que la barra mantiene su posición entre pausas del habla</p>
+                </div>
+
+                <!-- Threshold Controls -->
+                <div class="threshold-controls">
+                    <h3>Umbrales de Zona Verde</h3>
+
+                    <!-- Visual Preview -->
+                    <div class="threshold-preview">
+                        <div class="preview-thermometer">
+                            <div class="preview-zone preview-zone-danger-high" id="previewZoneHigh">
+                                <span class="zone-label">Negro (Muy Alto)</span>
+                            </div>
+                            <div class="preview-zone preview-zone-optimal" id="previewZoneOptimal">
+                                <span class="zone-label">Verde (Correcto)</span>
+                            </div>
+                            <div class="preview-zone preview-zone-low" id="previewZoneLow">
+                                <span class="zone-label">Rojo (Bajo)</span>
+                            </div>
+                        </div>
+                        <div class="preview-info">
+                            <p><strong>Vista previa</strong> de cómo se verán las zonas</p>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="upperThreshold" class="control-label">
+                            <span>Umbral Superior</span>
+                            <span class="control-value" id="upperThresholdValue">75</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="upperThreshold" class="slider slider-threshold-upper" min="30"
+                                max="95" value="75" aria-label="Umbral superior de zona verde">
+                        </div>
+                        <p class="control-description">Límite máximo de la zona verde (Rango: 30-95)</p>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="lowerThreshold" class="control-label">
+                            <span>Umbral Inferior</span>
+                            <span class="control-value" id="lowerThresholdValue">25</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="lowerThreshold" class="slider slider-threshold-lower" min="5"
+                                max="70" value="25" aria-label="Umbral inferior de zona verde">
+                        </div>
+                        <p class="control-description">Límite mínimo de la zona verde (Rango: 5-70)</p>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <button class="btn-primary" id="saveSettings">Guardar Configuración</button>
+            </div>
+        </div>
+
+        <!-- Session Summary Modal -->
+        <div class="modal" id="sessionModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Resumen de Sesión</h2>
+                    <button class="close-btn" id="closeModal" aria-label="Cerrar resumen">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <span class="summary-label">Duración Total</span>
+                            <span class="summary-value" id="summaryTotalTime">0:00</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Tiempo en Verde</span>
+                            <span class="summary-value" id="summaryGreenTime">0:00</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">% de Éxito</span>
+                            <span class="summary-value summary-highlight" id="summarySuccess">0%</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Pico Máximo</span>
+                            <span class="summary-value" id="summaryPeak">0 dB</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Consistencia</span>
+                            <span class="summary-value" id="summaryConsistency">100%</span>
+                        </div>
+                    </div>
+
+                    <canvas id="summaryChart" width="400" height="200"
+                        aria-label="Gráfico de distribución de estados"></canvas>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="newSessionBtn">Nueva Sesión</button>
+                    <button class="btn-primary" id="viewHistoryBtn">Ver Historial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>

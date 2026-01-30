@@ -27,6 +27,17 @@ class AudioAnalyzer {
     }
 
     /**
+     * Actualiza la constante de suavizado (amortiguación)
+     * @param {number} value - Valor entre 0 y 1 (ej: 0.8)
+     */
+    setSmoothingTimeConstant(value) {
+        this.smoothingTimeConstant = Math.max(0, Math.min(0.99, value));
+        if (this.analyser) {
+            this.analyser.smoothingTimeConstant = this.smoothingTimeConstant;
+        }
+    }
+
+    /**
      * Inicializa el contexto de audio y solicita permisos de micrófono
      * @returns {Promise<boolean>} - True si la inicialización fue exitosa
      */
@@ -154,8 +165,9 @@ class AudioAnalyzer {
         }
         const rms = Math.sqrt(sum / this.bufferLength);
 
-        // Convertir a escala 0-100 con boost aumentado para mayor sensibilidad
-        const volume = Math.min(100, rms * 200);
+        // Convertir a escala 0-100 con boost aumentado agresivamente (x400)
+        // Esto permite que voces normales llenen la barra sin gritar
+        const volume = Math.min(100, rms * 400);
 
         return volume;
     }

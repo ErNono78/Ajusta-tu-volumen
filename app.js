@@ -370,12 +370,10 @@ class EcoLogroApp {
         }
 
         // --- 2. ESCALADO VISUAL INTELIGENTE ---
-        // Transformamos el volumen numérico en altura visual basada en las zonas
 
         let visualHeight = 0;
 
-        // Cargar umbrales actuales (o usar defaults si no están en memoria)
-        // Nota: this.stateManager suele tener la config más fresca
+        // Cargar umbrales actuales del DOM (Fuente de la verdad)
         const lower = parseInt(this.elements.lowerThreshold.value) || 25;
         const upper = parseInt(this.elements.upperThreshold.value) || 75;
 
@@ -399,16 +397,17 @@ class EcoLogroApp {
         visualHeight = Math.min(100, Math.max(0, visualHeight));
         this.elements.thermometerFill.style.height = `${visualHeight}%`;
 
-        // Aplicar COLOR dinámico según la altura visual
-        // Limpiamos clases y añadimos la correcta
+        // --- 3. LÓGICA DE COLOR (Sincronización Estricta) ---
+        // El color depende SOLO de los umbrales, igual que el bulbo
+
         this.elements.thermometerFill.classList.remove('fill-low', 'fill-optimal', 'fill-high');
 
-        if (visualHeight <= 33.3) {
-            this.elements.thermometerFill.classList.add('fill-low');
-        } else if (visualHeight <= 85) {
-            this.elements.thermometerFill.classList.add('fill-optimal');
+        if (this.displayedVolume > upper) {
+            this.elements.thermometerFill.classList.add('fill-high'); // Negro (Alto)
+        } else if (this.displayedVolume > lower) {
+            this.elements.thermometerFill.classList.add('fill-optimal'); // Verde (Óptimo)
         } else {
-            this.elements.thermometerFill.classList.add('fill-high');
+            this.elements.thermometerFill.classList.add('fill-low'); // Rojo (Bajo)
         }
     }
 
@@ -438,6 +437,18 @@ class EcoLogroApp {
             persistenceDuration: parseInt(this.elements.persistenceSlider.value),
             studentName: this.elements.studentName.value.trim()
         };
+
+        // Aplicar amortiguación al analizador de audio en tiempo real
+        // Mapeamos 0-100 a 0-0.95 (para evitar el bloqueo total en 1.0)
+        if (this.audioAnalyzer) {
+            this.audioAnalyzer.setSmoothingTimeConstant(config.dampening / 105);
+        }
+
+        // Aplicar amortiguación al analizador de audio en tiempo real
+        // Mapeamos 0-100 a 0-0.95 (para evitar el bloqueo total en 1.0)
+        if (this.audioAnalyzer) {
+            this.audioAnalyzer.setSmoothingTimeConstant(config.dampening / 105);
+        }
 
         // Actualizar StateManager
         this.stateManager.updateConfiguration(config);

@@ -168,14 +168,14 @@ class AudioAnalyzer {
         // Volver a escala Lineal con Puerta de Ruido (Noise Gate)
         // Esto es mucho más efectivo para ignorar ruidos de fondo (pasos, aire) que la escala dB
 
-        // Ajuste x400: Necesario para que iPad y Móviles capten la voz con fuerza.
-        // Combinado con la Noise Gate abajo, esto no debería saturar con ruido ambiente.
-        let volume = Math.min(100, rms * 400);
+        // Ajuste x250: Punto ideal tras eliminar el filtrado doble del StateManager.
+        // Equilibrio entre captación de voz en iPad y estabilidad frente a ruidos.
+        let volume = Math.min(100, rms * 250);
 
         // --- NOISE GATE ---
-        // Si el volumen detectado es menor al 5%, se fuerza a 0 absoluto.
-        // Esto elimina el "nerviosismo" de la barra con el silencio relativo.
-        if (volume < 5) {
+        // Si el volumen detectado es menor al 8%, se fuerza a 0 absoluto.
+        // Esto hace que la barra sea más "limpia" y no salte con ruidos suaves.
+        if (volume < 8) {
             volume = 0;
         }
 

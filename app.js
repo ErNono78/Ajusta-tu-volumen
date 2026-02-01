@@ -312,15 +312,10 @@ class EcoLogroApp {
         this.elements.statusMessage.textContent = message;
         this.elements.emojiIcon.textContent = emoji;
 
-        // --- SINCRONIZACIÓN TOTAL DE COLOR ---
-        // 1. Fondo de pantalla (Background Waves)
+        // --- SINCRONIZACIÓN CENTRALIZADA ---
+        // Actualizamos SOLO el body. El CSS se encarga del resto (fondo, bulbo, barra).
+        // Esto previene fallos de sincronización en móviles/iPad.
         document.body.className = `state-${stateClass}`;
-
-        // 2. Bulbo del termómetro (Mercurio)
-        this.elements.thermometerMercury.className = `thermometer-mercury state-${stateClass}`;
-
-        // 3. Relleno de la barra (Barra dinámica)
-        this.elements.thermometerFill.className = `thermometer-fill state-${stateClass}`;
     }
 
     /**

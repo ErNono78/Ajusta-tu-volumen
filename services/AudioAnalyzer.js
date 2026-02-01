@@ -165,9 +165,10 @@ class AudioAnalyzer {
         }
         const rms = Math.sqrt(sum / this.bufferLength);
 
-        // Convertir a escala 0-100 con boost extremo (x600)
-        // Sensibilidad muy alta solicitada por el usuario para llenar la barra fácilmente
-        const volume = Math.min(100, rms * 600);
+        // Convertir a escala 0-100
+        // Ajuste a x300: Sensibilidad equilibrada para habla normal sin saturar por ruido ambiente.
+        // La "magia" visual de llenado ahora la maneja la curva en app.js, no la ganancia bruta aquí.
+        const volume = Math.min(100, rms * 300);
 
         return volume;
     }

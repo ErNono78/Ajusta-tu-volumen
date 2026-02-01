@@ -168,9 +168,9 @@ class AudioAnalyzer {
         // Volver a escala Lineal con Puerta de Ruido (Noise Gate)
         // Esto es mucho más efectivo para ignorar ruidos de fondo (pasos, aire) que la escala dB
 
-        // Ajuste x100: Sensibilidad base. Natural.
-        // Requiere una voz clara y directa. Ideal para evitar ruidos de ambiente.
-        let volume = Math.min(100, rms * 100);
+        // Ajuste x400: Necesario para que iPad y Móviles capten la voz con fuerza.
+        // Combinado con la Noise Gate abajo, esto no debería saturar con ruido ambiente.
+        let volume = Math.min(100, rms * 400);
 
         // --- NOISE GATE ---
         // Si el volumen detectado es menor al 5%, se fuerza a 0 absoluto.

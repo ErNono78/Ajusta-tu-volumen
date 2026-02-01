@@ -55,14 +55,9 @@ class StateManager {
      * @param {number} rawVolume - Volumen en bruto (0-100)
      * @returns {Object} - Estado actualizado con información relevante
      */
-    updateState(rawVolume) {
-        // Aplicar sensibilidad
-        let volume = this.applySensitivity(rawVolume);
-
-        // Aplicar dampening (suavizado)
-        volume = this.applyDampening(volume);
-
-        // Determinar nuevo estado
+    updateState(volume) {
+        // Determinamos el estado basándonos directamente en el volumen recibido.
+        // El volumen ya viene procesado con Peak Hold y Suavizado desde app.js.
         const newState = this.determineState(volume);
 
         // Verificar si hubo cambio de estado
@@ -74,15 +69,14 @@ class StateManager {
             this.notifyStateChange();
         }
 
-        this.previousVolume = volume;
+        this.lastVolume = volume;
 
         return {
             state: this.currentState,
             volume: volume,
-            rawVolume: rawVolume,
             stateChanged: stateChanged,
-            message: StateMessages[this.currentState],
-            emoji: StateEmojis[this.currentState],
+            message: this.getStateInfo(this.currentState).message,
+            emoji: this.getStateInfo(this.currentState).emoji,
             isInGreenZone: this.currentState === States.OPTIMAL
         };
     }

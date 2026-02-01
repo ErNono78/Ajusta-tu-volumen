@@ -165,10 +165,19 @@ class AudioAnalyzer {
         }
         const rms = Math.sqrt(sum / this.bufferLength);
 
-        // Convertir a escala 0-100
-        // Ajuste a x300: Sensibilidad equilibrada para habla normal sin saturar por ruido ambiente.
-        // La "magia" visual de llenado ahora la maneja la curva en app.js, no la ganancia bruta aquí.
-        const volume = Math.min(100, rms * 300);
+        // Volver a escala Lineal con Puerta de Ruido (Noise Gate)
+        // Esto es mucho más efectivo para ignorar ruidos de fondo (pasos, aire) que la escala dB
+
+        // Ajuste x100: Sensibilidad base. Natural.
+        // Requiere una voz clara y directa. Ideal para evitar ruidos de ambiente.
+        let volume = Math.min(100, rms * 100);
+
+        // --- NOISE GATE ---
+        // Si el volumen detectado es menor al 5%, se fuerza a 0 absoluto.
+        // Esto elimina el "nerviosismo" de la barra con el silencio relativo.
+        if (volume < 5) {
+            volume = 0;
+        }
 
         return volume;
     }

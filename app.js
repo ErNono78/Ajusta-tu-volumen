@@ -306,18 +306,21 @@ class EcoLogroApp {
      */
     handleStateChange(stateInfo) {
         const { state, message, emoji } = stateInfo;
+        const stateClass = state.toLowerCase();
 
         // Actualizar mensaje y emoji
         this.elements.statusMessage.textContent = message;
         this.elements.emojiIcon.textContent = emoji;
 
-        // Actualizar clase del body para cambio de color de fondo
-        document.body.className = '';
-        document.body.classList.add(`state-${state.toLowerCase()}`);
+        // --- SINCRONIZACIÓN TOTAL DE COLOR ---
+        // 1. Fondo de pantalla (Background Waves)
+        document.body.className = `state-${stateClass}`;
 
-        // Actualizar color del mercurio del termómetro
-        this.elements.thermometerMercury.className = 'thermometer-mercury';
-        this.elements.thermometerMercury.classList.add(`state-${state.toLowerCase()}`);
+        // 2. Bulbo del termómetro (Mercurio)
+        this.elements.thermometerMercury.className = `thermometer-mercury state-${stateClass}`;
+
+        // 3. Relleno de la barra (Barra dinámica)
+        this.elements.thermometerFill.className = `thermometer-fill state-${stateClass}`;
     }
 
     /**
@@ -402,19 +405,6 @@ class EcoLogroApp {
         // Asegurar límites visuales
         visualHeight = Math.min(100, Math.max(0, visualHeight));
         this.elements.thermometerFill.style.height = `${visualHeight}%`;
-
-        // --- 3. LÓGICA DE COLOR (Sincronización Estricta) ---
-        // El color depende SOLO de los umbrales, igual que el bulbo
-
-        this.elements.thermometerFill.classList.remove('fill-low', 'fill-optimal', 'fill-high');
-
-        if (this.displayedVolume > upper) {
-            this.elements.thermometerFill.classList.add('fill-high'); // Negro (Alto)
-        } else if (this.displayedVolume > lower) {
-            this.elements.thermometerFill.classList.add('fill-optimal'); // Verde (Óptimo)
-        } else {
-            this.elements.thermometerFill.classList.add('fill-low'); // Rojo (Bajo)
-        }
     }
 
     /**

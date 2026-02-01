@@ -6,14 +6,20 @@
     /* Color Tokens - Semantic Palette */
     --color-silent: hsl(0, 0%, 20%);
     --color-silent-bg: hsl(0, 0%, 15%);
-    --color-low: hsl(210, 50%, 50%);
-    --color-low-bg: hsl(210, 50%, 45%);
-    --color-optimal: hsl(142, 71%, 45%);
-    --color-optimal-bg: hsl(142, 71%, 40%);
+    --color-low: #EF4444;
+    /* Red */
+    --color-low-bg: #DC2626;
+    /* Darker Red */
+    --color-optimal: #10B981;
+    /* Green */
+    --color-optimal-bg: #059669;
+    /* Darker Green */
     --color-warning: hsl(48, 100%, 50%);
     --color-warning-bg: hsl(48, 100%, 45%);
-    --color-danger: hsl(0, 70%, 50%);
-    --color-danger-bg: hsl(0, 70%, 45%);
+    --color-danger: #1a1a1a;
+    /* Black */
+    --color-danger-bg: #000000;
+    /* Absolute Black */
 
     /* Neutral Colors */
     --color-neutral-50: hsl(0, 0%, 98%);
@@ -316,19 +322,25 @@ body.state-danger .background-waves {
 }
 
 /* Estados dinámicos de color para la barra */
-.thermometer-fill.fill-low {
+.thermometer-fill.state-silent {
+    background-color: #6B7280;
+    /* Gris */
+    box-shadow: 0 0 15px rgba(107, 114, 128, 0.3);
+}
+
+.thermometer-fill.state-low {
     background-color: #EF4444;
     /* Rojo */
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
 }
 
-.thermometer-fill.fill-optimal {
+.thermometer-fill.state-optimal {
     background-color: #10B981;
     /* Verde */
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
-.thermometer-fill.fill-high {
+.thermometer-fill.state-danger {
     background-color: #1a1a1a;
     /* Negro */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
